@@ -39,7 +39,7 @@ before_install:
   - gcloud --quiet components update
   - gcloud auth activate-service-account --key-file=gcp_terraform.json
   - gcloud --quiet config set project yugiohbot
-    gcloud --quiet config set compute/zone us-east1
+  - gcloud --quiet config set compute/zone us-east1
   - wget https://releases.hashicorp.com/terraform/${TERRAFORM}/terraform_${TERRAFORM}_linux_amd64.zip
   - unzip terraform_${TERRAFORM}_linux_amd64.zip
   - sudo mv terraform /usr/local/bin/
