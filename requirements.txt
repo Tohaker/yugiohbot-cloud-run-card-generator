@@ -1,0 +1,5 @@
+requests
+selenium
+flask
+gunicorn
+google-cloud-storage

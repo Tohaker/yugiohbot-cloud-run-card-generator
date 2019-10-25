@@ -1,0 +1,58 @@
+language: python
+python:
+  - "3.7"
+
+services:
+  - docker
+
+cache:
+  directories:
+  - "$HOME/google-cloud-sdk"
+
+env:
+  global:
+    - GOOGLE_CLOUD_KEYFILE_JSON=~/account.json
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+    - PYTHONPATH=yugiohbot
+
+addons:
+  apt:
+    update: true
+
+before_install:
+  - sudo apt-get install -y unzip chromium-browser
+  - mkdir -p ~/bin
+  - curl -SL https://chromedriver.storage.googleapis.com/77.0.3865.40/chromedriver_linux64.zip > chromedriver.zip
+  - unzip chromedriver.zip -d ~/bin/
+  - cp -r /usr/bin/chromium-browser ~/bin/
+  - ls -l ~/bin
+  - chmod +x ~/bin/chromedriver
+  - chmod +x ~/bin/chromium-browser
+  - if [ ! -d $HOME/google-cloud-sdk/bin ]; then
+    rm -rf $HOME/google-cloud-sdk;
+    curl https://sdk.cloud.google.com | bash > /dev/null;
+    fi
+  - source $HOME/google-cloud-sdk/path.bash.inc
+  - gcloud --quiet version
+  - gcloud --quiet components install beta
+  - gcloud --quiet components update
+  - gcloud auth activate-service-account
+  - gcloud --quiet config set project yugiohbot
+    gcloud --quiet config set compute/zone us-east1
+  - wget https://releases.hashicorp.com/terraform/${TERRAFORM}/terraform_${TERRAFORM}_linux_amd64.zip
+  - unzip terraform_${TERRAFORM}_linux_amd64.zip
+  - sudo mv terraform /usr/local/bin/
+  - terraform --version
+  - pip install -r requirements.txt
+  - pip install pytest-cov codecov
+
+install:
+  - pytest --cov=./
+
+before_deploy:
+  - docker build -t gcr.io/yugiohbot/card-generator .
+  - gcloud docker push gcr.io/yugiohbot/card-generator
+
+script:
+  - chmod +x deployment/deploy.sh
+  - ./deployment/deploy.sh
