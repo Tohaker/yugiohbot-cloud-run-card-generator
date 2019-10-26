@@ -51,6 +51,6 @@ install:
   - pytest --cov=./
   - codecov
   - docker build -t gcr.io/yugiohbot/card-generator .
-  - gcloud docker push gcr.io/yugiohbot/card-generator
+  - docker push gcr.io/yugiohbot/card-generator
   - chmod +x deployment/deploy.sh
   - ./deployment/deploy.sh
