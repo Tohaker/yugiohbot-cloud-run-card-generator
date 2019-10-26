@@ -14,6 +14,6 @@ terraform {
   backend "gcs" {
     bucket      = "yugiohbot-tf-state"
     prefix      = "card-generator"
-    credentials = "../gcp_terraform.json"
+    credentials = pathexpand("~/gcp_terraform.json")
   }
 }
