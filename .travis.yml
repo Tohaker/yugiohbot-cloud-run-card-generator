@@ -37,7 +37,7 @@ before_install:
   - gcloud --quiet version
   - gcloud --quiet components install beta
   - gcloud --quiet components update
-  - gcloud auth activate-service-account --key-file=gcp_terraform.json
+  - gcloud auth activate-service-account --key-file=~/gcp_terraform.json
   - gcloud auth configure-docker
   - gcloud --quiet config set project yugiohbot
   - gcloud --quiet config set compute/zone us-east1
