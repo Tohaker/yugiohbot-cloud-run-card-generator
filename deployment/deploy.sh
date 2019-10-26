@@ -24,4 +24,5 @@ terraform plan \
 echo "Applying Terraform."
 terraform apply \
     -auto-approve \
-    "output.tfplan"
+    "output.tfplan" \
+    TF_LOG=TRACE
