@@ -50,13 +50,8 @@ before_install:
 install:
   - pytest --cov=./
 
-before_deploy:
+after_success:
   - docker build -t gcr.io/yugiohbot/card-generator .
   - gcloud docker push gcr.io/yugiohbot/card-generator
   - chmod +x deployment/deploy.sh
-
-deploy:
-  provider: script
-  script: deployment/deploy.sh
-  on:
-    branch: master
+  - ./deployment/deploy.sh
