@@ -15,7 +15,7 @@ resource "google_cloud_run_service" "card_generator" {
 
   resources {
     limits {
-      memory = 1Gi
+      memory = "1Gi"
     }
   }
 }
