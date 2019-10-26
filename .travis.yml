@@ -38,7 +38,7 @@ before_install:
   - gcloud --quiet components install beta
   - gcloud --quiet components update
   - gcloud auth activate-service-account --key-file=gcp_terraform.json
-  - gcloud auth configure-docker --key-file=gcp_terraform.json
+  - gcloud auth configure-docker
   - gcloud --quiet config set project yugiohbot
   - gcloud --quiet config set compute/zone us-east1
   - wget https://releases.hashicorp.com/terraform/${TERRAFORM}/terraform_${TERRAFORM}_linux_amd64.zip
