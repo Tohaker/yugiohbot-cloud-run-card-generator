@@ -1,5 +1,5 @@
 resource "google_cloud_run_service" "card_generator" {
-  name      = local.cloud_run_service_name
+  name      = var.name
   location  = var.location
   provider  = "google-beta"
 
