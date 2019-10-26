@@ -1,11 +1,11 @@
 variable "name" {
   description = "The name of the cloud run service."
-  default = "yugiohbot__card-generator"
+  default = "yugiohbot-card-generator"
 }
 
 variable "location" {
   description = "The GCP region to deploy in."
-  default = "us-central1"
+  default = "us-east1"
 }
 
 variable "image" {
