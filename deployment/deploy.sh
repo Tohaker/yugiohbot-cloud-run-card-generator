@@ -14,6 +14,8 @@ pushd ${current_directory}
 
 set -e
 
+export TF_LOG=TRACE
+
 echo "Initialising Terraform."
 terraform init
 
@@ -24,5 +26,4 @@ terraform plan \
 echo "Applying Terraform."
 terraform apply \
     -auto-approve \
-    "output.tfplan" \
-    TF_LOG=TRACE
+    "output.tfplan" 
