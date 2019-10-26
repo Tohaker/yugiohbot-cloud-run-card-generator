@@ -14,8 +14,6 @@ pushd ${current_directory}
 
 set -e
 
-export TF_LOG=TRACE
-
 echo "Initialising Terraform."
 terraform init
 

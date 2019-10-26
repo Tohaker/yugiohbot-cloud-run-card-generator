@@ -12,6 +12,12 @@ resource "google_cloud_run_service" "card_generator" {
       image = var.image
     }
   }
+
+  resources {
+    limits {
+      memory = 1Gi
+    }
+  }
 }
 
 locals {
