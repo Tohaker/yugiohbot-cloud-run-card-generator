@@ -11,7 +11,7 @@ cache:
 
 env:
   global:
-    - GOOGLE_CLOUD_KEYFILE_JSON=~/account.json
+    - GOOGLE_CLOUD_KEYFILE_JSON=~/gcp_terraform.json
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
     - PYTHONPATH=yugiohbot
 
