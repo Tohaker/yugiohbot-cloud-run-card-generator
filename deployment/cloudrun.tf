@@ -1,7 +1,7 @@
 resource "google_cloud_run_service" "card_generator" {
-  name      = var.name
-  location  = var.location
-  provider  = "google-beta"
+  name     = var.name
+  location = var.location
+  provider = "google-beta"
 
   metadata {
     namespace = "yugiohbot"
@@ -10,12 +10,11 @@ resource "google_cloud_run_service" "card_generator" {
   spec {
     containers {
       image = var.image
-    }
-  }
-
-  resources {
-    limits {
-      memory = "1Gi"
+      resources {
+        limits = {
+          memory = "1Gi"
+        }
+      }
     }
   }
 }
