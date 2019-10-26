@@ -49,8 +49,7 @@ before_install:
 
 install:
   - pytest --cov=./
-
-after_success:
+  - codecov
   - docker build -t gcr.io/yugiohbot/card-generator .
   - gcloud docker push gcr.io/yugiohbot/card-generator
   - chmod +x deployment/deploy.sh
