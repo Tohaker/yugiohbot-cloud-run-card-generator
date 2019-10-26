@@ -5,7 +5,7 @@ variable "name" {
 
 variable "location" {
   description = "The GCP region to deploy in."
-  default = "us-east1"
+  default = "us-central1"
 }
 
 variable "image" {
