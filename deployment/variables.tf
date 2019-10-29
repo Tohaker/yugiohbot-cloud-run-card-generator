@@ -1,6 +1,6 @@
 variable "name" {
   description = "The name of the cloud run service."
-  default = "yugiohbot__card-generator"
+  default = "yugiohbot-card-generator"
 }
 
 variable "location" {
