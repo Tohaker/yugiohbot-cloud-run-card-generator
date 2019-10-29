@@ -62,7 +62,7 @@ def handler():
     gcsutils.upload_card(final_image_path)
 
     res = requests.post("https://us-east1-yugiohbot.cloudfunctions.net/yugiohbot__card-uploader",
-                        data={"title": title, "image": final_image_path})
+                        json={"title": title, "image": final_image_path})
 
     logging.debug(res)
 
