@@ -3,6 +3,7 @@ import logging
 import os
 import random
 
+import requests
 from flask import Flask
 from flask import request
 
@@ -59,6 +60,11 @@ def handler():
                     serial=card_serial, filename=final_image_path)
 
     gcsutils.upload_card(final_image_path)
+
+    res = requests.post("https://us-east1-yugiohbot.cloudfunctions.net/yugiohbot__card-uploader",
+                        data={"title": title, "image": final_image_path})
+
+    logging.debug(res)
 
     result = {'card_file': final_image_path}
     logging.debug(result)
