@@ -1,3 +1,4 @@
+import os
 import socket
 import unittest
 
@@ -23,6 +24,7 @@ class TestGCSUtils(unittest.TestCase):
         dest = '1.jpg'
         gcsutils.download_image(file, dest)
         capture.check(('root', 'DEBUG', 'Blob {} downloaded to {}.'.format(file, dest)))
+        os.remove(dest)
 
     def test_list_files_valid_bucket(self):
         bucket = 'yugiohbot-images'
