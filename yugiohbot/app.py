@@ -8,7 +8,7 @@ from flask import Flask
 from flask import request
 
 from card import neocardmaker as neo
-from utils import *
+from utils import gcsutils
 
 logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
@@ -23,10 +23,11 @@ def handler():
     logging.debug('Received title: ' + title)
     logging.debug('Received text: ' + effect)
 
-    card_image = str(random.choice(csvutils.get_card_ids('resources/cards_api.csv'))) + '.jpg'
+    card_image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images')).name)
     logging.debug('Chosen image: ' + card_image)
-    gcsutils.download_image(card_image)
-    card_image_path = os.path.abspath(card_image)
+    image_destination = card_image.replace('cropped/', '')
+    gcsutils.download_image(card_image, image_destination)
+    card_image_path = os.path.abspath(image_destination)
     logging.debug('Full path: ' + card_image_path)
 
     rarity = ['common', 'rare', 'ultra', 'secret']

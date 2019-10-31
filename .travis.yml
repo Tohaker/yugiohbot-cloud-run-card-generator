@@ -15,6 +15,10 @@ env:
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
     - PYTHONPATH=yugiohbot
 
+stages:
+  - name: after_success
+    if: branch = master
+
 addons:
   apt:
     update: true
@@ -47,11 +51,13 @@ before_install:
   - sudo mv terraform /usr/local/bin/
   - terraform --version
   - pip install -r requirements.txt
-  - pip install pytest-cov codecov
+  - pip install pytest-cov codecov testfixtures
 
 install:
   - pytest --cov=./
   - codecov
+
+after_success:
   - docker build -t gcr.io/yugiohbot/card-generator .
   - docker push gcr.io/yugiohbot/card-generator
   - chmod +x deployment/deploy.sh
