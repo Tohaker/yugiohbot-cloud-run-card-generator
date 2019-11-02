@@ -9,7 +9,7 @@ resource "google_cloud_run_service" "card_generator" {
 
   spec {
     containers {
-      image = var.image
+      image = "${var.image}:${var.digest}"
       resources {
         limits = {
           memory = "1Gi"

@@ -14,11 +14,14 @@ pushd ${current_directory}
 
 set -e
 
+echo "Docker Image Digest: ${DIGEST}"
+
 echo "Initialising Terraform."
 terraform init
 
 echo "Planning Terraform."
 terraform plan \
+    -var="digest=$DIGEST" \
     -out=output.tfplan
 
 echo "Applying Terraform."
