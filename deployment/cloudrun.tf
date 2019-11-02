@@ -8,11 +8,13 @@ resource "google_cloud_run_service" "card_generator" {
   }
 
   spec {
+    container_concurrency = 80
     containers {
-      image = "${var.image}:${var.digest}"
+      image = "${var.image}@${var.digest}"
       resources {
         limits = {
-          memory = "1Gi"
+          cpu    = "1000m"
+          memory = "1024Mi"
         }
       }
     }
