@@ -8,7 +8,7 @@ from flask import Flask
 from flask import request
 
 from card import neocardmaker as neo
-from utils import *
+from utils import gcsutils
 
 logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
@@ -19,26 +19,42 @@ def handler():
     logging.debug(request.args)
 
     title = request.args.get('title')
-    effect = request.args.get('text')
+    effect = request.args.get('effect')
+    flavour = request.args.get('flavour')
     logging.debug('Received title: ' + title)
-    logging.debug('Received text: ' + effect)
+    logging.debug('Received effect: ' + effect)
+    logging.debug('Received flavour: ' + flavour)
 
-    card_image = str(random.choice(csvutils.get_card_ids('resources/cards_api.csv'))) + '.jpg'
+    card_image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images')).name)
     logging.debug('Chosen image: ' + card_image)
-    gcsutils.download_image(card_image)
-    card_image_path = os.path.abspath(card_image)
+    image_destination = card_image.replace('cropped/', '')
+    gcsutils.download_image(card_image, image_destination)
+    card_image_path = os.path.abspath(image_destination)
     logging.debug('Full path: ' + card_image_path)
 
     rarity = ['common', 'rare', 'ultra', 'secret']
-    template = ['Normal', 'Effect', 'Ritual', 'Fusion', 'Synchro', 'DarkSynchro', 'Xyz', 'Unity', 'Link',
-                'Token', 'Spell', 'Trap', 'Skill']
-    attribute = ['None', 'Dark', 'Divine', 'Earth', 'Fire', 'Light', 'Water', 'Wind', 'Spell', 'Trap']
-    cardtype = ['Monster', 'Ritual', 'Fusion', 'Spell', 'Trap', 'Synchro', 'Xyz']
+    template = ['Normal', 'Effect', 'Ritual', 'Fusion', 'Synchro', 'DarkSynchro', 'Xyz']
+    attribute = ['None', 'Dark', 'Divine', 'Earth', 'Fire', 'Light', 'Water', 'Wind']
+    race = ['Aqua', 'Beast', 'Beast-Warrior', 'Creator-God', 'Cyberse', 'Dinosaur', 'Divine-Beast', 'Dragon',
+            'Fairy', 'Fiend', 'Fish', 'Insect', 'Machine', 'Plant', 'Psychic', 'Pyro', 'Reptile', 'Rock', 'Sea Serpent',
+            'Spellcaster', 'Thunder', 'Warrior', 'Winged Beast']
 
     card_rarity = random.choice(rarity)
     card_template = random.choice(template)
     card_attribute = random.choice(attribute)
-    card_type = random.choice(cardtype)
+    card_race = random.choice(race)
+
+    if card_template != 'Normal' and card_template != 'Effect':
+        card_type = card_race + '/ ' + card_template + '/ Effect'
+    elif card_template != 'Effect':
+        card_type = card_race + '/ ' + card_template
+    else:
+        card_type = card_race
+
+    if card_template == 'Normal':
+        text = flavour
+    else:
+        text = effect
 
     attack = str(int(round(random.randint(0, 7000), -2)))
     defense = str(int(round(random.randint(0, 7000), -2)))
@@ -56,7 +72,8 @@ def handler():
 
     neo.create_card(name=title, rarity=card_rarity, template=card_template, attribute=card_attribute,
                     level=str(random.randint(0, 12)), picture=card_image_path, type=card_type,
-                    effect=effect, atk=attack, defense=defense, creator='YuGiOh-Bot', year='2019',
+                    effect=text, atk=attack, defense=defense, creator='YuGiOh-Bot',
+                    year=str(datetime.date.today().year),
                     serial=card_serial, filename=final_image_path)
 
     gcsutils.upload_card(final_image_path)
