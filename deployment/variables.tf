@@ -10,7 +10,7 @@ variable "location" {
 
 variable "image" {
   description = "Name of the docker image to deploy"
-  default = "gcr.io/yugiohbot/card-generator"
+  default = "gcr.io/yugiohbot/card-generator:latest"
 }
 
 variable "bucket_name" {

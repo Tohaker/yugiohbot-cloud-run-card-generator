@@ -33,7 +33,7 @@ def handler():
     logging.debug('Full path: ' + card_image_path)
 
     rarity = ['common', 'rare', 'ultra', 'secret']
-    template = ['Normal', 'Effect', 'Ritual', 'Fusion', 'Synchro', 'DarkSynchro', 'Xyz']
+    template = ['Normal', 'Effect', 'Ritual', 'Synchro', 'DarkSynchro', 'Xyz']
     attribute = ['None', 'Dark', 'Divine', 'Earth', 'Fire', 'Light', 'Water', 'Wind']
     race = ['Aqua', 'Beast', 'Beast-Warrior', 'Creator-God', 'Cyberse', 'Dinosaur', 'Divine-Beast', 'Dragon',
             'Fairy', 'Fiend', 'Fish', 'Insect', 'Machine', 'Plant', 'Psychic', 'Pyro', 'Reptile', 'Rock', 'Sea Serpent',
