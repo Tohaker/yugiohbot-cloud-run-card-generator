@@ -15,10 +15,6 @@ env:
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
     - PYTHONPATH=yugiohbot
 
-stages:
-  - name: after_success
-    if: branch = master
-
 addons:
   apt:
     update: true
@@ -39,6 +35,12 @@ before_install:
     curl https://sdk.cloud.google.com | bash > /dev/null;
     fi
   - source $HOME/google-cloud-sdk/path.bash.inc
+  - wget https://releases.hashicorp.com/terraform/${TERRAFORM}/terraform_${TERRAFORM}_linux_amd64.zip
+  - unzip terraform_${TERRAFORM}_linux_amd64.zip
+  - sudo mv terraform /usr/local/bin/
+  - terraform --version
+
+install:
   - gcloud --quiet version
   - gcloud --quiet components install beta
   - gcloud --quiet components update
@@ -46,19 +48,22 @@ before_install:
   - gcloud auth configure-docker
   - gcloud --quiet config set project yugiohbot
   - gcloud --quiet config set compute/zone us-east1
-  - wget https://releases.hashicorp.com/terraform/${TERRAFORM}/terraform_${TERRAFORM}_linux_amd64.zip
-  - unzip terraform_${TERRAFORM}_linux_amd64.zip
-  - sudo mv terraform /usr/local/bin/
-  - terraform --version
   - pip install -r requirements.txt
   - pip install pytest-cov codecov testfixtures
 
-install:
+script:
   - pytest --cov=./
-  - codecov
 
 after_success:
+  - codecov
+
+before_deploy:
   - docker build -t gcr.io/yugiohbot/card-generator .
   - docker push gcr.io/yugiohbot/card-generator
   - chmod +x deployment/deploy.sh
-  - ./deployment/deploy.sh
+
+deploy:
+  provider: script
+  script: bash deployment/deploy.sh
+  on:
+    branch: master
