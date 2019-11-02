@@ -56,8 +56,26 @@ def handler():
     else:
         text = effect
 
-    attack = str(int(round(random.randint(0, 7000), -2)))
-    defense = str(int(round(random.randint(0, 7000), -2)))
+    card_level = random.randint(0, 12)
+
+    max_stats = {
+        0: 0,
+        1: 500,
+        2: 1000,
+        3: 1750,
+        4: 2000,
+        5: 2600,
+        6: 2600,
+        7: 3000,
+        8: 3000,
+        9: 4000,
+        10: 4000,
+        11: 5000,
+        12: 5000
+    }
+
+    attack = str(int(round(random.randint(0, max_stats.get(card_level)), -2)))
+    defense = str(int(round(random.randint(0, max_stats.get(card_level)), -2)))
     card_serial = str(random.randint(0, 9999999999))
 
     final_image_path = datetime.datetime.now().strftime("%d-%m-%Y-%H:%M:%S") + '.jpg'
@@ -71,7 +89,7 @@ def handler():
     logging.debug('serial: ' + card_serial)
 
     neo.create_card(name=title, rarity=card_rarity, template=card_template, attribute=card_attribute,
-                    level=str(random.randint(0, 12)), picture=card_image_path, type=card_type,
+                    level=str(card_level), picture=card_image_path, type=card_type,
                     effect=text, atk=attack, defense=defense, creator='YuGiOh-Bot',
                     year=str(datetime.date.today().year),
                     serial=card_serial, filename=final_image_path)
