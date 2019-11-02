@@ -65,5 +65,6 @@ before_deploy:
 deploy:
   provider: script
   script: bash deployment/deploy.sh
+  skip_cleanup: true
   on:
     branch: master
