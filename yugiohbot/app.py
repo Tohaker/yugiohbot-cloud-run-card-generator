@@ -20,10 +20,10 @@ def handler():
 
     title = request.args.get('title')
     effect = request.args.get('effect')
-    flavour = request.args.get('flavour')
+    card_template = request.args.get('template')
     logging.debug('Received title: ' + title)
     logging.debug('Received effect: ' + effect)
-    logging.debug('Received flavour: ' + flavour)
+    logging.debug('Received template: ' + card_template)
 
     card_image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images')).name)
     logging.debug('Chosen image: ' + card_image)
@@ -33,28 +33,33 @@ def handler():
     logging.debug('Full path: ' + card_image_path)
 
     rarity = ['common', 'rare', 'ultra', 'secret']
-    template = ['Normal', 'Effect', 'Ritual', 'Synchro', 'DarkSynchro', 'Xyz']
+    # template options are ['Normal', 'Effect', 'Ritual', 'Synchro', 'DarkSynchro', 'Xyz', 'Spell', 'Trap', 'Fusion']
     attribute = ['None', 'Dark', 'Divine', 'Earth', 'Fire', 'Light', 'Water', 'Wind']
     race = ['Aqua', 'Beast', 'Beast-Warrior', 'Creator-God', 'Cyberse', 'Dinosaur', 'Divine-Beast', 'Dragon',
             'Fairy', 'Fiend', 'Fish', 'Insect', 'Machine', 'Plant', 'Psychic', 'Pyro', 'Reptile', 'Rock', 'Sea Serpent',
             'Spellcaster', 'Thunder', 'Warrior', 'Winged Beast']
+    spell_type = ['None', 'Continuous', 'Counter', 'Equip', 'Field', 'Quick-play', 'Ritual']
+    trap_type = ['None', 'Continuous', 'Counter']
 
     card_rarity = random.choice(rarity)
-    card_template = random.choice(template)
     card_attribute = random.choice(attribute)
     card_race = random.choice(race)
 
     if card_template != 'Normal' and card_template != 'Effect':
         card_type = card_race + '/ ' + card_template + '/ Effect'
-    elif card_template != 'Effect':
+    elif card_template != 'Normal':
         card_type = card_race + '/ ' + card_template
+    elif card_template == 'Spell' or card_template == 'Trap':
+        card_type = '{} Card'.format(card_template)
+        card_attribute = card_template
     else:
         card_type = card_race
 
-    if card_template == 'Normal':
-        text = flavour
-    else:
-        text = effect
+    card_icon = 'None'
+    if card_template == 'Spell':
+        card_icon = random.choice(spell_type)
+    elif card_template == 'Trap':
+        card_icon = random.choice(trap_type)
 
     card_level = random.randint(0, 12)
 
@@ -89,15 +94,15 @@ def handler():
     logging.debug('serial: ' + card_serial)
 
     neo.create_card(name=title, rarity=card_rarity, template=card_template, attribute=card_attribute,
-                    level=str(card_level), picture=card_image_path, type=card_type,
-                    effect=text, atk=attack, defense=defense, creator='YuGiOh-Bot',
+                    level=str(card_level), picture=card_image_path, type=card_type, icon=card_icon,
+                    effect=effect, atk=attack, defense=defense, creator='YuGiOh-Bot',
                     year=str(datetime.date.today().year),
                     serial=card_serial, filename=final_image_path)
 
     gcsutils.upload_card(final_image_path)
 
     res = requests.post("https://us-east1-yugiohbot.cloudfunctions.net/yugiohbot__card-uploader",
-                        json={"title": title, "image": final_image_path})
+                        json={"title": title, "image": final_image_path, "card_image": image_destination[:-4]})
 
     logging.debug(res)
 

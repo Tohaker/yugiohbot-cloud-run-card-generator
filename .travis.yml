@@ -60,6 +60,7 @@ after_success:
 before_deploy:
   - docker build -t gcr.io/yugiohbot/card-generator .
   - docker push gcr.io/yugiohbot/card-generator
+  - export DIGEST=$(docker image ls --digests gcr.io/yugiohbot/card-generator --format "{{.Digest}}")
   - chmod +x deployment/deploy.sh
 
 deploy:

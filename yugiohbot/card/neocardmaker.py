@@ -20,6 +20,7 @@ def create_card(**kwargs):
     fill_text_box(driver, 'Level', kwargs.get('level'))
     upload_card_image(driver, kwargs.get('picture'))
     fill_text_box(driver, 'Type', kwargs.get('type'))
+    select_from_drop_down(driver, 'Icon', kwargs.get('icon'))
     fill_text_area(driver, 'Effect', kwargs.get('effect'))
     fill_text_box(driver, 'Attack', kwargs.get('atk'))
     fill_text_box(driver, 'Defense and/or Link', kwargs.get('defense'))
