@@ -1,11 +1,46 @@
 import logging
 
+import requests
+import urllib3
+from google.api_core.client_options import ClientOptions
+from google.auth.credentials import AnonymousCredentials
 from google.cloud import storage
 
-storage_client = storage.Client()
+
+def create_storage_client(test):
+    if test:
+        EXTERNAL_URL = "https://127.0.0.1:4443"
+        PUBLIC_HOST = "storage.gcs.127.0.0.1.nip.io:4443"
+
+        storage.blob._API_ACCESS_ENDPOINT = "https://" + PUBLIC_HOST
+        storage.blob._DOWNLOAD_URL_TEMPLATE = (
+                u"%s/download/storage/v1{path}?alt=media" % EXTERNAL_URL
+        )
+        storage.blob._BASE_UPLOAD_TEMPLATE = (
+                u"%s/upload/storage/v1{bucket_path}/o?uploadType=" % EXTERNAL_URL
+        )
+        storage.blob._MULTIPART_URL_TEMPLATE = storage.blob._BASE_UPLOAD_TEMPLATE + u"multipart"
+        storage.blob._RESUMABLE_URL_TEMPLATE = storage.blob._BASE_UPLOAD_TEMPLATE + u"resumable"
+
+        my_http = requests.Session()
+        my_http.verify = False  # disable SSL validation
+        urllib3.disable_warnings(
+            urllib3.exceptions.InsecureRequestWarning
+        )  # disable https warnings for https insecure certs
+
+        storage_client = storage.Client(
+            credentials=AnonymousCredentials(),
+            project="test",
+            _http=my_http,
+            client_options=ClientOptions(api_endpoint=EXTERNAL_URL),
+        )
+    else:
+        storage_client = storage.Client()
+
+    return storage_client
 
 
-def upload_card(file):
+def upload_card(file, storage_client):
     bucket_name = "generated-cards"
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(file)
@@ -14,7 +49,7 @@ def upload_card(file):
     logging.debug("File {} uploaded to {}.".format(file, file))
 
 
-def download_image(file, destination):
+def download_image(file, destination, storage_client):
     bucket_name = "yugiohbot-images"
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(file)
@@ -22,6 +57,6 @@ def download_image(file, destination):
     logging.debug('Blob {} downloaded to {}.'.format(file, destination))
 
 
-def list_files_in_bucket(bucket):
+def list_files_in_bucket(bucket, storage_client):
     file_list = list(storage_client.list_blobs(bucket, prefix='cropped'))
     return file_list

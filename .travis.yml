@@ -52,6 +52,7 @@ install:
   - pip install pytest-cov codecov testfixtures
 
 script:
+  - docker run -d --name fake-gcs-server -p 4443:4443 -v $PWD/yugiohbot/tests/data:/data fsouza/fake-gcs-server
   - pytest --cov=./
 
 after_success:
