@@ -3,6 +3,7 @@ import logging
 import requests
 import urllib3
 from google.api_core.client_options import ClientOptions
+from google.api_core.exceptions import NotFound
 from google.auth.credentials import AnonymousCredentials
 from google.cloud import storage
 
@@ -58,5 +59,10 @@ def download_image(file, destination, storage_client):
 
 
 def list_files_in_bucket(bucket, storage_client):
-    file_list = list(storage_client.list_blobs(bucket, prefix='cropped'))
+    file_list = []
+    try:
+        file_list = list(storage_client.list_blobs(bucket, prefix='cropped'))
+    except NotFound as e:
+        logging.debug('Could not find bucket {}: {}'.format(bucket, e))
+
     return file_list
