@@ -49,9 +49,10 @@ install:
   - gcloud --quiet config set project yugiohbot
   - gcloud --quiet config set compute/zone us-east1
   - pip install -r requirements.txt
-  - pip install pytest-cov codecov testfixtures
+  - pip install pytest-cov codecov
 
 script:
+  - docker run -d --name fake-gcs-server -p 4443:4443 -v $PWD/yugiohbot/tests/data:/data fsouza/fake-gcs-server
   - pytest --cov=./
 
 after_success:

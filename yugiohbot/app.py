@@ -25,62 +25,23 @@ def handler():
     logging.debug('Received effect: ' + effect)
     logging.debug('Received template: ' + card_template)
 
-    card_image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images')).name)
-    logging.debug('Chosen image: ' + card_image)
-    image_destination = card_image.replace('cropped/', '')
-    gcsutils.download_image(card_image, image_destination)
-    card_image_path = os.path.abspath(image_destination)
-    logging.debug('Full path: ' + card_image_path)
+    storage_client = gcsutils.create_storage_client(False)
+    image_destination, card_image_path = choose_card_image(storage_client)
 
     rarity = ['common', 'rare', 'ultra', 'secret']
     # template options are ['Normal', 'Effect', 'Ritual', 'Synchro', 'DarkSynchro', 'Xyz', 'Spell', 'Trap', 'Fusion']
-    attribute = ['None', 'Dark', 'Divine', 'Earth', 'Fire', 'Light', 'Water', 'Wind']
     race = ['Aqua', 'Beast', 'Beast-Warrior', 'Creator-God', 'Cyberse', 'Dinosaur', 'Divine-Beast', 'Dragon',
             'Fairy', 'Fiend', 'Fish', 'Insect', 'Machine', 'Plant', 'Psychic', 'Pyro', 'Reptile', 'Rock', 'Sea Serpent',
             'Spellcaster', 'Thunder', 'Warrior', 'Winged Beast']
-    spell_type = ['None', 'Continuous', 'Counter', 'Equip', 'Field', 'Quick-play', 'Ritual']
-    trap_type = ['None', 'Continuous', 'Counter']
 
     card_rarity = random.choice(rarity)
-    card_attribute = random.choice(attribute)
+    card_attribute = create_card_attribute(card_template)
     card_race = random.choice(race)
-
-    if card_template != 'Normal' and card_template != 'Effect':
-        card_type = card_race + '/ ' + card_template + '/ Effect'
-    elif card_template != 'Normal':
-        card_type = card_race + '/ ' + card_template
-    elif card_template == 'Spell' or card_template == 'Trap':
-        card_type = '{} Card'.format(card_template)
-        card_attribute = card_template
-    else:
-        card_type = card_race
-
-    card_icon = 'None'
-    if card_template == 'Spell':
-        card_icon = random.choice(spell_type)
-    elif card_template == 'Trap':
-        card_icon = random.choice(trap_type)
-
+    card_type = create_card_type(card_template, card_race)
+    card_icon = choose_card_icon(card_template)
     card_level = random.randint(0, 12)
 
-    max_stats = {
-        0: 0,
-        1: 500,
-        2: 1000,
-        3: 1750,
-        4: 2000,
-        5: 2600,
-        6: 2600,
-        7: 3000,
-        8: 3000,
-        9: 4000,
-        10: 4000,
-        11: 5000,
-        12: 5000
-    }
-
-    attack = str(int(round(random.randint(0, max_stats.get(card_level)), -2)))
-    defense = str(int(round(random.randint(0, max_stats.get(card_level)), -2)))
+    attack, defense = choose_card_stats(card_level)
     card_serial = str(random.randint(0, 9999999999))
 
     final_image_path = datetime.datetime.now().strftime("%d-%m-%Y-%H:%M:%S") + '.jpg'
@@ -99,7 +60,7 @@ def handler():
                     year=str(datetime.date.today().year),
                     serial=card_serial, filename=final_image_path)
 
-    gcsutils.upload_card(final_image_path)
+    gcsutils.upload_card(final_image_path, storage_client)
 
     res = requests.post("https://us-east1-yugiohbot.cloudfunctions.net/yugiohbot__card-uploader",
                         json={"title": title, "image": final_image_path, "card_image": image_destination[:-4]})
@@ -109,6 +70,77 @@ def handler():
     result = {'card_file': final_image_path}
     logging.debug(result)
     return result
+
+
+def choose_card_image(storage_client):
+    image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images', storage_client)).name)
+    logging.debug('Chosen image: ' + image)
+
+    image_destination = image.replace('cropped/', '')
+    gcsutils.download_image(image, image_destination, storage_client)
+    card_image_path = os.path.abspath(image_destination)
+    logging.debug('Full path: ' + card_image_path)
+
+    return image_destination, card_image_path
+
+
+def create_card_type(template, race):
+    if template == 'Spell' or template == 'Trap':
+        card_type = '{} Card'.format(template)
+    elif template != 'Normal' and template != 'Effect':
+        card_type = race + ' / ' + template + ' / Effect'
+    elif template != 'Normal':
+        card_type = race + ' / ' + template
+    else:
+        card_type = race
+
+    return card_type
+
+
+def create_card_attribute(template):
+    attribute = ['None', 'Dark', 'Divine', 'Earth', 'Fire', 'Light', 'Water', 'Wind']
+    if template == 'Spell' or template == 'Trap':
+        card_attribute = template
+    else:
+        card_attribute = random.choice(attribute)
+    return card_attribute
+
+
+def choose_card_icon(template):
+    spell_type = ['None', 'Continuous', 'Counter', 'Equip', 'Field', 'Quick-play', 'Ritual']
+    trap_type = ['None', 'Continuous', 'Counter']
+
+    if template == 'Spell':
+        card_icon = random.choice(spell_type)
+    elif template == 'Trap':
+        card_icon = random.choice(trap_type)
+    else:
+        card_icon = 'None'
+
+    return card_icon
+
+
+def choose_card_stats(level):
+    max_stats = {
+        0: 0,
+        1: 500,
+        2: 1000,
+        3: 1750,
+        4: 2000,
+        5: 2600,
+        6: 2600,
+        7: 3000,
+        8: 3000,
+        9: 4000,
+        10: 4000,
+        11: 5000,
+        12: 5000
+    }
+
+    attack = str(int(round(random.randint(0, max_stats.get(level)), -2)))
+    defense = str(int(round(random.randint(0, max_stats.get(level)), -2)))
+
+    return attack, defense
 
 
 if __name__ == '__main__':
