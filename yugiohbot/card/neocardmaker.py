@@ -89,11 +89,3 @@ def download_card_image(driver, filename):
     canvas_png = base64.b64decode(canvas_base64)
     with open(filename, 'wb') as f:
         f.write(canvas_png)
-
-
-if __name__ == '__main__':
-    testdriver = setup_web_driver('https://yemachu.github.io/cardmaker/')
-    file = os.path.abspath("data/cropped/11.jpg")
-    upload_card_image(testdriver, file)
-    download_card_image(testdriver, 'ygo.png')
-    testdriver.close()

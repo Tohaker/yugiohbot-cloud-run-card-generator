@@ -65,6 +65,14 @@ class TestNeoCardMaker(unittest.TestCase):
         self.assertTrue(os.path.isfile(path))
         os.remove(path)
 
+    def test_upload_card_image(self):
+        filename = '1.jpg'
+        path = os.path.abspath('data/yugiohbot-images/cropped/' + filename)
+        neocardmaker.upload_card_image(self.test_driver, path)
+        self.assertTrue(
+            filename in self.test_driver.find_element(By.XPATH, '//label[text()="Image"]/input[2]').get_attribute(
+                'value'))
+
 
 if __name__ == '__main__':
     unittest.main()
