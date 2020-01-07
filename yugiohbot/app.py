@@ -2,6 +2,8 @@ import datetime
 import logging
 import os
 import random
+import shutil
+import ntpath
 
 import requests
 from flask import Flask
@@ -72,12 +74,31 @@ def handler():
     return result
 
 
-def choose_card_image(storage_client):
-    image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images', storage_client)).name)
-    logging.debug('Chosen image: ' + image)
+def download_from_shitpostbot():
+    base = 'https://www.shitpostbot.com/'
+    rand_url = 'api/randsource'
 
-    image_destination = image.replace('cropped/', '')
-    gcsutils.download_image(image, image_destination, storage_client)
+    image_url = base + requests.get(base + rand_url).json()['sub']['img']['full']
+    file_name = ntpath.basename(image_url)
+
+    response = requests.get(image_url, stream=True)
+    file = open(file_name, 'wb')
+    response.raw.decode_content = True
+    shutil.copyfileobj(response.raw, file)
+
+    return file_name
+
+
+def choose_card_image(storage_client):
+    # 20% chance of getting a shitpostbot source image.
+    if random.random() < 0.2:
+        image_destination = download_from_shitpostbot()
+    else:
+        image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images', storage_client)).name)
+        logging.debug('Chosen image: ' + image)
+        image_destination = image.replace('cropped/', '')
+        gcsutils.download_image(image, image_destination, storage_client)
+
     card_image_path = os.path.abspath(image_destination)
     logging.debug('Full path: ' + card_image_path)
 
