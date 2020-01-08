@@ -28,7 +28,7 @@ def handler():
     logging.debug('Received template: ' + card_template)
 
     storage_client = gcsutils.create_storage_client(False)
-    image_destination, card_image_path = choose_card_image(storage_client)
+    image_destination, card_image_path = choose_card_image(storage_client, random.random())
 
     rarity = ['common', 'rare', 'ultra', 'secret']
     # template options are ['Normal', 'Effect', 'Ritual', 'Synchro', 'DarkSynchro', 'Xyz', 'Spell', 'Trap', 'Fusion']
@@ -65,7 +65,7 @@ def handler():
     gcsutils.upload_card(final_image_path, storage_client)
 
     res = requests.post("https://us-east1-yugiohbot.cloudfunctions.net/yugiohbot__card-uploader",
-                        json={"title": title, "image": final_image_path, "card_image": image_destination[:-4]})
+                        json={"title": title, "image": final_image_path, "card_image": os.path.splitext(image_destination)[0]})
 
     logging.debug(res)
 
@@ -89,9 +89,9 @@ def download_from_shitpostbot():
     return file_name
 
 
-def choose_card_image(storage_client):
+def choose_card_image(storage_client, random_percentage):
     # 20% chance of getting a shitpostbot source image.
-    if random.random() < 0.2:
+    if random_percentage < 0.2:
         image_destination = download_from_shitpostbot()
     else:
         image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images', storage_client)).name)
