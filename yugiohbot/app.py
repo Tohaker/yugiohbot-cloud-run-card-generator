@@ -28,7 +28,7 @@ def handler():
     logging.debug('Received template: ' + card_template)
 
     storage_client = gcsutils.create_storage_client(False)
-    image_destination, card_image_path, is_submission = choose_card_image(storage_client)
+    image_destination, card_image_path, is_submission = choose_card_image(storage_client, random.random())
 
     rarity = ['common', 'rare', 'ultra', 'secret']
     # template options are ['Normal', 'Effect', 'Ritual', 'Synchro', 'DarkSynchro', 'Xyz', 'Spell', 'Trap', 'Fusion']
@@ -68,7 +68,7 @@ def handler():
         image_destination = 'Submission from a fan - submit yours at https://yugiohbot3000.github.io/submission/....'
 
     res = requests.post("https://us-east1-yugiohbot.cloudfunctions.net/yugiohbot__card-uploader",
-                        json={"title": title, "image": final_image_path, "card_image": image_destination[:-4]})
+                        json={"title": title, "image": final_image_path, "card_image": os.path.splitext(image_destination)[0]})
 
     logging.debug(res)
 
@@ -92,14 +92,15 @@ def download_from_shitpostbot():
     return file_name
 
 
-def choose_card_image(storage_client):
+def choose_card_image(storage_client, random_percentage):
     # 20% chance of getting a shitpostbot source image.
     is_submission = False
-    if random.random() < 0.2:
+    if random_percentage < 0.2:
         image_destination = download_from_shitpostbot()
     else:
         prefix = 'cropped'
-        if random.random() < 0.3:
+        # 30% chance of getting a submitted image.
+        if random_percentage < 0.3:
             prefix = 'submissions'
             is_submission = True
 

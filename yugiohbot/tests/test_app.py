@@ -1,5 +1,6 @@
 import os
 import unittest
+import random
 
 import app
 from utils import gcsutils
@@ -10,13 +11,31 @@ class TestApp(unittest.TestCase):
     def setUp(self):
         self.storage_client = gcsutils.create_storage_client(True)
 
-    # This test won't work now. I'll try to rework it another time.
-    # def test_choose_card_image(self):
-    #     images = ['1.jpg', '2.jpg']
-    #     image_destination, card_image_path = app.choose_card_image(self.storage_client)
-    #     self.assertTrue(any(i in card_image_path for i in images))
-    #     self.assertTrue(any(i in image_destination for i in images))
-    #     os.remove(card_image_path)
+    def test_choose_card_image_spb(self):
+        chance = 0.1
+        image_destination, card_image_path = app.choose_card_image(self.storage_client, chance)
+
+        self.assertTrue(len(card_image_path) > 0)
+        self.assertTrue(len(image_destination) > 0)
+        os.remove(card_image_path)
+
+    def test_choose_card_image_cropped(self):
+        images = ['1.jpg', '2.jpg']
+        chance = 0.5
+        image_destination, card_image_path = app.choose_card_image(self.storage_client, chance)
+
+        self.assertTrue(any(i in card_image_path for i in images))
+        self.assertTrue(any(i in image_destination for i in images))
+        os.remove(card_image_path)
+
+    def test_choose_card_image_submission(self):
+        images = ['3.jpg', '4.jpg']
+        chance = 0.25
+        image_destination, card_image_path = app.choose_card_image(self.storage_client, chance)
+
+        self.assertTrue(any(i in card_image_path for i in images))
+        self.assertTrue(any(i in image_destination for i in images))
+        os.remove(card_image_path)
 
     def test_create_card_type(self):
         test_templates = ['Spell', 'Trap', 'Fusion', 'Effect', 'Normal']
