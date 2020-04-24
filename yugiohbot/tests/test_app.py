@@ -13,28 +13,31 @@ class TestApp(unittest.TestCase):
 
     def test_choose_card_image_spb(self):
         chance = 0.1
-        image_destination, card_image_path = app.choose_card_image(self.storage_client, chance)
+        image_destination, card_image_path, is_submission = app.choose_card_image(self.storage_client, chance)
 
         self.assertTrue(len(card_image_path) > 0)
         self.assertTrue(len(image_destination) > 0)
+        self.assertFalse(is_submission)
         os.remove(card_image_path)
 
     def test_choose_card_image_cropped(self):
         images = ['1.jpg', '2.jpg']
         chance = 0.5
-        image_destination, card_image_path = app.choose_card_image(self.storage_client, chance)
+        image_destination, card_image_path, is_submission = app.choose_card_image(self.storage_client, chance)
 
         self.assertTrue(any(i in card_image_path for i in images))
         self.assertTrue(any(i in image_destination for i in images))
+        self.assertFalse(is_submission)
         os.remove(card_image_path)
 
     def test_choose_card_image_submission(self):
         images = ['3.jpg', '4.jpg']
         chance = 0.25
-        image_destination, card_image_path = app.choose_card_image(self.storage_client, chance)
+        image_destination, card_image_path, is_submission = app.choose_card_image(self.storage_client, chance)
 
         self.assertTrue(any(i in card_image_path for i in images))
         self.assertTrue(any(i in image_destination for i in images))
+        self.assertTrue(is_submission)
         os.remove(card_image_path)
 
     def test_create_card_type(self):
