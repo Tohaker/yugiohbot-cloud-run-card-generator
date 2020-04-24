@@ -58,10 +58,10 @@ def download_image(file, destination, storage_client):
     logging.debug('Blob {} downloaded to {}.'.format(file, destination))
 
 
-def list_files_in_bucket(bucket, storage_client):
+def list_files_in_bucket(bucket, prefix, storage_client):
     file_list = []
     try:
-        file_list = list(storage_client.list_blobs(bucket, prefix='cropped'))
+        file_list = list(storage_client.list_blobs(bucket, prefix=prefix))
     except NotFound as e:
         logging.debug('Could not find bucket {}: {}'.format(bucket, e))
 

@@ -28,7 +28,7 @@ def handler():
     logging.debug('Received template: ' + card_template)
 
     storage_client = gcsutils.create_storage_client(False)
-    image_destination, card_image_path = choose_card_image(storage_client)
+    image_destination, card_image_path, is_submission = choose_card_image(storage_client)
 
     rarity = ['common', 'rare', 'ultra', 'secret']
     # template options are ['Normal', 'Effect', 'Ritual', 'Synchro', 'DarkSynchro', 'Xyz', 'Spell', 'Trap', 'Fusion']
@@ -64,6 +64,9 @@ def handler():
 
     gcsutils.upload_card(final_image_path, storage_client)
 
+    if is_submission:
+        image_destination = 'Submission from a fan - submit yours at https://yugiohbot3000.github.io/submission/....'
+
     res = requests.post("https://us-east1-yugiohbot.cloudfunctions.net/yugiohbot__card-uploader",
                         json={"title": title, "image": final_image_path, "card_image": image_destination[:-4]})
 
@@ -91,18 +94,24 @@ def download_from_shitpostbot():
 
 def choose_card_image(storage_client):
     # 20% chance of getting a shitpostbot source image.
+    is_submission = False
     if random.random() < 0.2:
         image_destination = download_from_shitpostbot()
     else:
-        image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images', storage_client)).name)
+        prefix = 'cropped'
+        if random.random() < 0.3:
+            prefix = 'submissions'
+            is_submission = True
+
+        image = str(random.choice(gcsutils.list_files_in_bucket('yugiohbot-images', prefix, storage_client)).name)
         logging.debug('Chosen image: ' + image)
-        image_destination = image.replace('cropped/', '')
+        image_destination = image.replace(prefix + '/', '')
         gcsutils.download_image(image, image_destination, storage_client)
 
     card_image_path = os.path.abspath(image_destination)
     logging.debug('Full path: ' + card_image_path)
 
-    return image_destination, card_image_path
+    return image_destination, card_image_path, is_submission
 
 
 def create_card_type(template, race):

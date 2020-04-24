@@ -22,14 +22,16 @@ class TestGCSUtils(unittest.TestCase):
 
     def test_list_files_valid_bucket(self):
         bucket = 'yugiohbot-images'
+        prefix = 'cropped'
         storage_client = gcsutils.create_storage_client(True)
-        list = gcsutils.list_files_in_bucket(bucket, storage_client)
+        list = gcsutils.list_files_in_bucket(bucket, prefix, storage_client)
         self.assertTrue(len(list) > 0)
 
     def test_list_files_invalid_bucket(self):
         bucket = 'wrong'
+        prefix = 'cropped'
         storage_client = gcsutils.create_storage_client(True)
-        list = gcsutils.list_files_in_bucket(bucket, storage_client)
+        list = gcsutils.list_files_in_bucket(bucket, prefix, storage_client)
         self.assertTrue(len(list) == 0)
 
 
