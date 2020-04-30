@@ -100,7 +100,7 @@ def choose_card_image(storage_client, random_percentage):
     else:
         prefix = 'cropped'
         # 30% chance of getting a submitted image.
-        if random_percentage < 0.3:
+        if random_percentage < 0.25:
             prefix = 'submissions'
             is_submission = True
 

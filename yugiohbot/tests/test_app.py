@@ -32,7 +32,7 @@ class TestApp(unittest.TestCase):
 
     def test_choose_card_image_submission(self):
         images = ['3.jpg', '4.jpg']
-        chance = 0.25
+        chance = 0.24
         image_destination, card_image_path, is_submission = app.choose_card_image(self.storage_client, chance)
 
         self.assertTrue(any(i in card_image_path for i in images))
