@@ -11,8 +11,8 @@ from card import neocardmaker
 class TestNeoCardMaker(unittest.TestCase):
     def setUp(self):
         if sys.platform == 'linux':
-            os.environ['CHROMIUM'] = '/home/travis/bin/chromium-browser'
-            os.environ['CHROMEDRIVER'] = '/home/travis/bin/chromedriver'
+            os.environ['CHROMIUM'] = '/home/runner/bin/chromium-browser'
+            os.environ['CHROMEDRIVER'] = '/home/runner/bin/chromedriver'
         else:
             os.environ['CHROMIUM'] = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
             os.environ['CHROMEDRIVER'] = 'C:\\Program Files\\chromedriver\\chromedriver.exe'
