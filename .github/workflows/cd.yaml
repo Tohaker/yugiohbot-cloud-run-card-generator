@@ -17,9 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -43,7 +40,6 @@ jobs:
           gcloud info
           gcloud --quiet components install beta
           gcloud --quiet components update
-          gcloud auth activate-service-account
           gcloud auth configure-docker
           gcloud --quiet config set project yugiohbot
           gcloud --quiet config set compute/zone us-east1

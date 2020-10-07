@@ -22,26 +22,6 @@ jobs:
         with:
           python-version: 3.7
 
-      - uses: hashicorp/setup-terraform@v1
-      - run: terraform --version
-
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-        with:
-          service_account_email: ${{ secrets.GCP_EMAIL }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          export_default_credentials: true
-
-      - name: Install GCP Components
-        run: |
-          gcloud info
-          gcloud --quiet components install beta
-          gcloud --quiet components update
-          gcloud auth activate-service-account
-          gcloud auth configure-docker
-          gcloud --quiet config set project yugiohbot
-          gcloud --quiet config set compute/zone us-east1
-
       - name: Setup Chromium
         run: |
           sudo apt-get install -y unzip chromium-browser
