@@ -1,0 +1,91 @@
+name: CD
+
+on:
+  push:
+    branches:
+      master
+
+jobs:
+  build:
+    env:
+      PYTHONPATH: yugiohbot
+      CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+      ACCESS_TOKEN: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+      PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - uses: hashicorp/setup-terraform@v1
+      - run: terraform --version
+
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          service_account_email: ${{ secrets.GCP_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          export_default_credentials: true
+
+      - name: Install GCP Components
+        run: |
+          gcloud info
+          gcloud --quiet components install beta
+          gcloud --quiet components update
+          gcloud auth activate-service-account
+          gcloud auth configure-docker
+          gcloud --quiet config set project yugiohbot
+          gcloud --quiet config set compute/zone us-east1
+
+      - name: Setup Chromium
+        run: |
+          sudo apt-get install -y unzip chromium-browser
+          mkdir -p ~/bin
+          curl -SL https://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip > chromedriver.zip
+          unzip chromedriver.zip -d ~/bin/
+          cp -r /usr/bin/chromium-browser ~/bin/
+          ls -l ~/bin
+          chmod +x ~/bin/chromedriver
+          chmod +x ~/bin/chromedriver
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r yugiohbot/requirements.txt
+          pip install pytest-cov codecov
+
+      - name: Run Tests
+        run: |
+          docker run -d --name fake-gcs-server -p 4443:4443 -v $PWD/yugiohbot/tests/data:/data fsouza/fake-gcs-server
+          pytest --cov=./
+
+      - name: Report coverage
+        run: codecov
+
+      - name: Build Docker Image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: false
+          tags: gcr.io/yugiohbot/card-generator
+          secrets: GCP_SA_KEY=${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup Deployment
+        run: chmod +x ./deployment/deploy.sh
+
+#      - name: Run Deployment
+#        run: deployment/deploy.sh
+#        env:
+#          DIGEST: ${{ steps.docker_build.outputs.digest }}
