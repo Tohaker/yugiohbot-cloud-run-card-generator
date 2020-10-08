@@ -73,11 +73,12 @@ jobs:
         run: codecov
 
       - name: Build Docker Image
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-        run: |
-          docker build -t gcr.io/yugiohbot/card-generator \
-            --build-arg GCP_SA_KEY .
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: false
+          tags: gcr.io/yugiohbot/card-generator
+          secrets: GCP_SA_KEY=${{ secrets.GCP_SA_KEY }}
 
       - name: Push Docker Image to GCR
         run: |
