@@ -74,7 +74,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          export GCP_SA_KEY=${{ secrets.GCP_SA_KEY }}
+          GCP_SA_KEY=`echo ${{ secrets.GCP_SA_KEY }}`
           docker build -t gcr.io/yugiohbot/card-generator \
             --build-arg GCP_SA_KEY .
 
