@@ -76,7 +76,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          push: false
+          load: true
           tags: gcr.io/yugiohbot/card-generator
           secrets: GCP_SA_KEY=${{ secrets.GCP_SA_KEY }}
 
