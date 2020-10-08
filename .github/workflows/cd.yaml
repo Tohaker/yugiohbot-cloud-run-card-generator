@@ -44,13 +44,6 @@ jobs:
           gcloud --quiet config set project yugiohbot
           gcloud --quiet config set compute/zone us-east1
 
-      - name: Login to Docker
-        uses: docker/login-action@v1
-        with:
-          registry: gcr.io
-          username: _json_key
-          password: ${{ secrets.GCP_SA_KEY }}
-
       - name: Setup Chromium
         env:
           CHROMIUM_VERSION: 85.0.4183.121-0ubuntu0.18.04.1
@@ -80,13 +73,14 @@ jobs:
         run: codecov
 
       - name: Build Docker Image
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: gcr.io/yugiohbot/card-generator
-          secrets: GCP_SA_KEY=${{ secrets.GCP_SA_KEY }}
+        run: |
+          docker build -t gcr.io/yugiohbot/card-generator \
+            --build-arg GCP_SA_KEY=${{ secrets.GCP_SA_KEY }} .
+
+      - name: Push Docker Image to GCR
+        run: |
+          docker push gcr.io/yugiohbot/card-generator
+          echo "DIGEST=$(docker image ls --digests gcr.io/yugiohbot/card-generator --format "{{.Digest}}")" >> $GITHUB_ENV
 
       - name: Setup Deployment
         run: chmod +x ./deployment/deploy.sh
@@ -94,4 +88,4 @@ jobs:
       - name: Run Deployment
         run: deployment/deploy.sh
         env:
-          DIGEST: ${{ steps.docker_build.outputs.digest }}
+          DIGEST: $DIGEST
