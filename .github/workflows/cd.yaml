@@ -72,13 +72,15 @@ jobs:
       - name: Report coverage
         run: codecov
 
+      - name: Download Service Account file
+        run: gsutil cp gs://yugiohbot-sa/gcp_terraform.json gcp_terraform.json
+
       - name: Build Docker Image
         uses: docker/build-push-action@v2
         with:
           context: .
           load: true
           tags: gcr.io/yugiohbot/card-generator
-          secrets: GCP_SA_KEY=${{ secrets.GCP_SA_KEY }}
 
       - name: Push Docker Image to GCR
         run: |
