@@ -90,5 +90,3 @@ jobs:
 
       - name: Run Deployment
         run: deployment/deploy.sh
-        env:
-          DIGEST: $DIGEST
