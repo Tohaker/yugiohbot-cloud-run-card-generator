@@ -52,7 +52,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y unzip chromium-browser=$CHROMIUM_VERSION
           mkdir -p ~/bin
-          curl -SL https://chromedriver.storage.googleapis.com/`$CHROMEDRIVER_VERSION`/chromedriver_linux64.zip > chromedriver.zip
+          curl -SL https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip > chromedriver.zip
           unzip chromedriver.zip -d ~/bin/
           cp -r /usr/bin/chromium-browser ~/bin/
           ls -l ~/bin
