@@ -45,11 +45,14 @@ jobs:
           gcloud --quiet config set compute/zone us-east1
 
       - name: Setup Chromium
+        env:
+          CHROMIUM_VERSION: 85.0.4183.121-0ubuntu0.18.04.1
+          CHROMEDRIVER_VERSION: 85.0.4183.87
         run: |
           sudo apt-get update
-          sudo apt-get install -y unzip chromium-browser
+          sudo apt-get install -y unzip chromium-browser=$CHROMIUM_VERSION
           mkdir -p ~/bin
-          curl -SL https://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip > chromedriver.zip
+          curl -SL https://chromedriver.storage.googleapis.com/`$CHROMEDRIVER_VERSION`/chromedriver_linux64.zip > chromedriver.zip
           unzip chromedriver.zip -d ~/bin/
           cp -r /usr/bin/chromium-browser ~/bin/
           ls -l ~/bin
