@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import Select
 
 
 def create_card(**kwargs):
-    url = 'https://yemachu.github.io/cardmaker/'
+    url = 'https://yugiohbot3000.github.io/cardmaker/'
 
     driver = setup_web_driver(url)
     cp = '© ' + kwargs.get('year') + ' ' + kwargs.get('creator')

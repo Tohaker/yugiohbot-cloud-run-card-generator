@@ -17,7 +17,7 @@ class TestNeoCardMaker(unittest.TestCase):
             os.environ['CHROMIUM'] = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
             os.environ['CHROMEDRIVER'] = 'C:\\Program Files\\chromedriver\\chromedriver.exe'
 
-        url = 'https://yemachu.github.io/cardmaker/'
+        url = 'https://yugiohbot3000.github.io/cardmaker/'
         self.test_driver = neocardmaker.setup_web_driver(url)
         self.test_driver.implicitly_wait(1)
 
