@@ -2,8 +2,7 @@ name: CD
 
 on:
   push:
-    branches:
-      master
+    branches: master
 
 jobs:
   build:
@@ -46,7 +45,7 @@ jobs:
 
       - name: Setup Chromium
         env:
-          CHROMIUM_VERSION: 85.0.4183.121-0ubuntu0.18.04.1
+          CHROMIUM_VERSION: 85.0.4183.121-1ubuntu1
           CHROMEDRIVER_VERSION: 85.0.4183.87
         run: |
           sudo apt-get update
