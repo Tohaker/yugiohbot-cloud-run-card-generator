@@ -24,8 +24,8 @@ jobs:
 
       - name: Setup Chromium
         env:
-          CHROMIUM_VERSION: 85.0.4183.121-1ubuntu1
-          CHROMEDRIVER_VERSION: 85.0.4183.87
+          CHROMIUM_VERSION: 87.0.4280.66-0ubuntu0.18.04.1
+          CHROMEDRIVER_VERSION: 87.0.4280.88
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip chromium-browser=$CHROMIUM_VERSION
